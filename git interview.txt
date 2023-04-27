@@ -72,17 +72,52 @@
     -> Version history: Git provides a detailed history of all changes made to a project, including who made the change, when it was made, and    
        what was changed. This makes it easy to track down bugs and troubleshoot issues.
     
+14. Difference between Git and SVN? 
+    Git is a distributed version control system, while SVN is a centralized version control system.
+    In Git, each developer has a local copy of the entire repository, which allows them to work offline and independently. In SVN, there is a 
+    central repository that all developers need to connect through internet.
 
-     
+15. What does command git config do? What is functionality of git-ls-tree. 
+    The git-ls-tree command is used to list the contents of a specified tree object in Git. It shows the files, directories, and subdirectories 
+    in the tree, along with their metadata.
+    The git config command is used to set or get configuration options for Git. These options can be set at the system, user, or repository   
+    level.
 
+16. What is git cherry pick? 
+    git cherry-pick is a command in Git that allows you to apply the changes made in a specific commit onto another branch. It is a useful 
+    feature when you want to bring specific change from other branch into our current branch without merging the entire branch.
 
+17. Difference between git revert and git reset? 
+    git revert undo a specific commit by creating a new commit, The original commit remains in the repository's history, but its changes are 
+    reversed. This is a safe way to undo changes because it does not modify the repository's history.
+    []#git revert <commit-id>
+    did reset:-Remove the file from working tree and Index. 
+    
+20. What does commit message mean? 
+    A commit message is a short description that explains the changes made to a Git repository in a particular commit.
 
+21. What do you mean by HEAD in term of git And also tell the number of HEAD that can be present in repository? 
+   HEAD is a pointer to the current branch or commit that where we are working on.HEAD can point to either a branch or a specific commit. When 
+   HEAD points to a branch, it represents the most recent commit on that branch. When you make a new commit, HEAD is automatically updated to 
+   point to the new commit.
+   there can only be one HEAD at a time.
 
- 
+22.Difference between HEAD working tree and index in a git
+   The working tree is where we make changes to our files.It's basically directory where our Git repository is located.and it contains the files    
+   that you we are currently working on When we modify a file in the working tree, Git recognizes that the file has changed, but the changes are 
+   not yet staged for commit. using git add . we can staged the working tree
+   staging area, is  area where we can stage changes to your files before we commit them to the repository
+   The HEAD is a reference to the current commit that you are working on.
 
- 
+23.What does git Reflog do?
+   The reflog maintains a history of all the previous positions of the HEAD pointer, including any changes to branches or commits that were not 
+   properly saved. It also tracks any changes that were made to the repository's index or working directory, including any changes that were .
+   made to files that were subsequently deleted
 
-
+24.Can you recover deleted branch in git?
+   Yes, it is possible to recover deleted branch in Git,
+   we need to find the commit id of the last commit on the deleted branch. we can do this by using the git 
+   reflog command, which shows a log of all the changes to the repository's HEAD reference, including the deletion of the branch
 
 
 

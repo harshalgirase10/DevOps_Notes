@@ -1,0 +1,115 @@
+1. What is Git?
+  Git is a distributed version control system for tracking changes in codes or files..
+  It was developed by Linus Torvalds in 2005 and has become one of the most widely used version control systems
+  Git allows developers to store and manage different versions of a project's source code and track changes made to the code over time.
+  One of the key advantages of Git is its distributed nature, which means that each developer has a local copy of the entire repository and can
+  work offline without connected to a central server.
+
+2. Difference between git fetch and git pull?
+  git fetch retrieves the latest changes from the remote repository but does not apply them to the local branch. 
+  git pull retrieves the latest changes from the remote repository and also apply them to the local branch.
+
+
+3. Difference between git repository and branch
+   A Git repository is a collection of files,codes, along with their version history ,that is managed by the Git version control system.
+   A repository can contain one or more number of branches, which are separate lines of development. we can have multiple branches within a single
+   repository. 
+   Whereas branch is a specific line of development within a Git repository. Each branch can have its own set of commits, which represent changes          
+   made to the code over time.  
+
+4.what is gihub?
+  GitHub is a Git repository hosting service that provides a web-based graphical interface
+  GitHub provides a user-friendly web interface that allows developers to create, manage, and browse repositories,Users can also interact with 
+  repositories using the command-line interface,which allows them to perform all Git-related tasks, such as cloning, committing, and merging.
+
+5. What is git push, git pull?
+   git push and git pull are both Git commands used for pushing and pulling changes between remote repositories and local repositories.
+   git push is used to push local changes to a remote repository.
+   git pull is used to pull changes from a remote repository to a local repository.
+
+6. What is git clone git remote? 
+   git clone and git remote are both Git commands that are used to work with remote repositories.
+   git clone is used to create a local copy of a remote repository.
+   git remote is used to manage the connections between a local repository and remote repositories.
+
+7. Difference between git merge and git rebase? 
+   git merge and git rebase both are used to integrate changes from one branch into another.
+   Specifically,git merge combines the changes from one branch to another branch.when we run git merge it creates a new commit that contains all 
+   of the changes from the merged branch.
+   whereas,git rebase changes the base of a branch to the tip of another branch.it creates linear history on main branch.
+
+8. How can you fix broken commit? 
+   git commit --ammend
+
+9. What happen if .git directory gets deleted? 
+  The .git directory in a Git repository contains all the metadata and configuration files that Git uses to manage the repository's version  
+  control. and If it gets deleted, the repository's version control history and configuration will be lost, and the repository will no longer be 
+  repository.
+  Deleting the .git directory will also remove all of the repository's commits, branches, tags, and other version control metadata, so any 
+  changes that were made to the repository since the last commit will be lost. 
+
+10. What is use of staging area or indexing in git? 
+    the staging area or index in Git is a place where you can prepare your changes for a commit and selectively choose which changes to include, 
+    allowing you to organize your changes and commit only what you intend to include.
+
+11. What is version control system? 
+    A version control system (VCS) is a software that helps developers manage the changes to their codes and other files.
+    it Keep a history of changes:
+    using vcs Multiple developers can work on the same codesbase
+    Experiment with new features: using branches
+    Roll back changes:
+
+12. What are the different git repository hosting functions? 
+     Git repository hosting platforms include GitHub, GitLab, Bitbucket
+     Repository hosting: The ability to host Git repositories and manage access to them
+
+
+13. What are the advantages of git or features of git?
+    ->it is a distributed version control system, which means that each developer has a local copy of the entire project history. This makes it 
+      easy to work offline
+    -> One of the biggest advantages of Git is its branching capabilities. it is easy to create branches for experimenting new features without
+       affecting the stability of master branch.after and we can easily merge them         
+    -> Version history: Git provides a detailed history of all changes made to a project, including who made the change, when it was made, and    
+       what was changed. This makes it easy to track down bugs and troubleshoot issues.
+    
+
+     
+
+
+
+
+ 
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+   

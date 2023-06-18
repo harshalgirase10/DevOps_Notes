@@ -1,0 +1,185 @@
+Ansible commands
+
+[root]yum update -y
+[root]wget https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+[root]ls -ltr
+[root]yum install epel-release-latest-7.noarch.rpm
+[root]yum update -y
+[root]yum install git python python-level python-pip openssh ansible -y
+[root]ansible --verion
+[root]which ansible
+
+[root]find /etc/ansible/hosts
+[root]cat /etc/ansible/hosts
+[root]cat /etc/ansible/ansible.cfg    
+
+[root]vi /etc/ansible/hosts
+create group
+[groupname]
+private ip of node1
+private ip of node2
+.
+.
+etc
+
+[root]vi /etc/ansible/ansible.cfg
+uncomment #inventory = /etc/ansible/hosts
+uncomment #sudo_user =root
+
+(do same on all nodes)
+
+
+adduser ansible
+passwd ansible
+
+
+[root]visudo
+root  ALL=(ALL)       (ALL)
+ansible ALL=(ALL) NOPASSWD: ALL
+
+(do same in all nodes)
+
+
+
+[root]vi /etc/ssh/sshd_config
+uncomment #permitrotlogin  yes
+uncommet #passwordauthontication yes
+comment passwordauthontication no
+ service sshd restart
+
+(do same in all nodes)
+
+
+
+su - ansible
+
+[ansiblemaster] ssh-keygen
+[ansiblemaster] cd .ssh
+[ansiblemaster] ssh-copy-id ansible@node1 ip
+[ansiblemaster] ssh-copy-id ansible@node2 ip
+
+
+
+[ansiblemaster]ssh <node ip>
+[ansiblemaster]ssh 172.31.35.155
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>it will connect<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+
+ssh 172.31.35.155
+ansible all --list-host
+ansible demo --list-host
+ansible demo[0] --list-host  --------shows first node
+ansible demo[-1] --list-host  ------shows last node
+
+
+ansible demo[0:1] --list-host    ------show group of node 
+
+
+**************************************************************************************************************
+
+////ad hoc/////
+
+[ansiblemaster] ansible demo -a "ls"
+[ansiblemaster]ansible all -a "touch rajputfile"
+
+[ansiblemaster] ansible demo -a "sudo yum install httpd -y"
+
+[ansiblemaster] ansible demo -ba "yum remove httpd -y"  -> "-b is replica of sudo"
+
+////modules/////
+
+
+[ansiblemaster]ansible demo -b -m yum -a "pkg=httpd state=present"
+try repeat this 
+[ansiblemaster]ansible demo -b -m yum -a "pkg=httpd state=present"
+it will show there is idempotency
+
+now update the package//
+[ansiblemaster]ansible demo -b -m yum -a "pkg=httpd state=latest"
+
+now remove the package 
+[ansiblemaster]ansible demo -b -m yum -a "pkg=httpd state=absent"
+
+now again install
+[ansiblemaster]ansible demo -b -m yum -a "pkg=httpd state=present"
+
+now start the httpd service
+[ansiblemaster]ansible demo -b -m service -a "name=httpd state=started"
+
+now create user in nodes
+[ansiblemaster]ansible demo -b -m user -a "name=bhupinderrajput"
+
+do check created user in nodes 
+cat /etc/passwd
+
+now copy file from ansible server to perticular node
+firstly create file
+[ansiblemaster]touch copiedfromserver
+[ansiblemaster]ansible demo[-1] -b -m copy -a "src=copiedfromserver dest=/tmp"
+
+
+
+
+////////////set-up/////////////
+
+[ansiblemaster]ansible demo -m setup
+it will fetch all nodes details
+
+
+now i want to get only ip address of nodes 
+[ansiblemaster]ansible demo -m setup -a "filter=*ipv4*"
+
+
+*****try other filter using google
+
+*************************************************************************************************************
+
+//////playbook//////
+
+delete all files in ansible master 
+[ansiblemaster] rm -rf *
+
+create file name target.yml
+and then 
+[ansiblemaster]vi target.yml
+
+--- #My first testing YAML playbook
+-host: demo
+ user: ansible
+ become: yes
+ connection: ssh
+ gather_facts: yes
+ 
+[ansiblemaster]ansible-playbook target.yml
+
+remove httpd service from both the nodes 
+
+now create other playbook with httpd task
+[ansiblemaster]vi task.yml
+
+--- #my first test playbook 
+- hosts: demo
+  user: ansible
+  become:yes
+  connection: ssh
+  task:
+         - name: Install HTTPD on centos 7
+           action: yum name=httpd state=installed 
+
+[ansiblemaster]ansible-playbook task.yml
+
+[ansiblemaster]vi carieable.yml
+--- #my variable file testing 
+- hosts: demo
+  user: ansible
+  become: yes
+  connection: ssh
+  vars: 
+         pkgname: httpd
+  task: 
+         - name: Install HTTPD server on centos 7
+           action: yum name='{{pkgname}}' state=present
+
+[ansiblemaster]ansible-playbook variable.yml
+

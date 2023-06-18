@@ -1,0 +1,163 @@
+1.what is Ansible 
+  Ansible is an open source. IT configuration management. Deploy an orchestration tool. It aims to provide large productivity gains to a wide    variety of automation challenges.
+
+2.Ansible History
+  Michael Dahaan developed and the Ansible project began in February 2012. 
+  Redhat acquired the Ansible tool in 2015. 
+  Ansible is available for RHEL, Debian, CentOS, Oracle Linux. 
+
+
+
+3.Can you use this tool whether your servers are in on premises or in the cloud.
+ Whether your servers are on-premises or in the cloud, Ansible uses a similar approach to manage and configure them
+ Ansible communicates with servers through SSH (Secure Shell) by default, which is a standard method for securely connecting to remote machines.    This allows Ansible to execute tasks and manage configurations on the target servers, regardless of their location.
+ It turns your code into infrastructure. 
+  i.e. Your computing environment has some of the same attributes as your application. 
+
+
+4.Advantages:-
+
+  Ansible is a free to use by everyone. 
+  Ansible is very consistent and lightweight and no constraint Regarding the OS or underlying hardware are present. 
+  It is very secure due to its agent less capabilities and open SSH security features.
+  Ansible does not need any special System Administrator skills to install and use it. 
+  It is a push mechanism.
+
+5.Disadvantages:-
+  Insufficient user interface, Though Ansible Tower is GUI, But it is still in development stage.
+  Cannot achieve full automation by Ansible. 
+
+  New to the market, therefore limited support and document is available.
+
+
+6.Terms used in Ansible.
+  Ansible Server:- The machine where ansible is installed and from which all tasks and playbooks will be Run.
+  Module:- Basically a module is a command or a set of similar commands meant to be executed on the client side.
+  Task:- A task is a section that consists of a single procedure to be completed.
+  Role:- A way of organising tasks and related files to be later called in a playbook. 
+  Fact:- Information fetched from the client system from the Global variables with the Gather facts operation. 
+  Inventory:- File containing data about the Ansible client servers.
+  Play:- Execution of playbook.
+  Handler:- Task which is called only if a notifier is present. 
+  Notifier:- Section attributed to a task which calls a handler if the output is changed.
+  Playbooks:- It consists code in YAML format which describes task to be executed.
+  Host:- Nodes, whcih are automated by ansible. 
+
+**********************************************
+lec 32
+
+7.AD hoc Commands
+  no idempotemcy in ad hoc
+  ad hoc commands are commands which can be  run  individually to perform quick functions.
+  these ad hoc commands are not used for configuration management and deployment because these commands are of one time usage
+  The Ansible ad hoc command uses the /user/bin/ansible command line tool to automate a single task.
+
+8.modules
+  here is idempotemcy
+  ansible ships with number of modules (called module library) that can be excecuted directly on remote host or through playbook. 
+  your library of module can reside on any machine , and there are no servers, daemons, or databases required.
+  module is collection of configuration files
+ 
+9.where modules are stored?
+  the default location for inventory file is 
+  /etc/ansible/hosts
+
+
+10.what is playbook
+   playbook in asible are written in yaml languege
+   it is human readable data serialization languege
+   it is commanly used for configureation files
+   playbook is like file where u write codes, consist of variable,task, handlers, files, templates and roles.
+   each playbook is composed of one or more modules in list.
+   module is collection of configuration files
+
+  playbooks are divided into many section 
+  like, 
+
+  target section - defines the host  against which playbook task has to be executed
+
+  variable section - defines variable 
+
+  task section - list of all module that we need to run , in an order 
+
+
+11.what is YAML
+   yet another markup languege
+
+   for ansible nearly every file start with a list
+   each itom in the list is list of key-value pair commanly called directory
+
+   all yaml file have began with "---" and end with "..."
+   all member of list line must began with same identation level starting with "-"
+
+   A directory is represented in simple "key: value" form 
+
+   Extension for yaml file ".yml" 
+
+
+
+12.what is variables in ansible
+   Ansible uses variable which are defined previously to enable more flexibility in playbooks and roles
+   they can be used to loop through set of given value, access various information , like the host name of a system and replace 
+   certain strings in template with specific value
+ 
+put variable section above tasks so that we define it first , and use it later.
+
+
+13.what is handlers in ansible
+   handler is exactly the same as a task but it will run when called by another task.
+   or 
+   handler are just like regular tasks in an ansible playbook , but are only  run if the task contains a notify directive and also indicates 
+   that it changed something.
+
+
+14.what is Dry run
+   just to check wheather the playbook is correct or not 
+
+
+15.what is loops in ansible
+   sometimes u want to repeat task multiple times , in computer programing this is called loops , common ansible loops include changing 
+   ownership on several files and/or directories with the file module , creating multiple user with the user module and repeating a 
+   polling step untill certain result is reached.
+
+*********************************************************************************
+
+///////////conditions
+
+whenever we have different diffrent scenarios, we put condition acordingly to the scenario.
+
+when statement: when u want to skip perticular command on perticular node 
+
+
+////////Roles
+
+we cam use two techniques for reusing a set of tasks: includes and roles 
+
+roles are good for organising tasks and encapsulating data needed to accomplish those tasks 
+
+we can organise playbook into a directory structure called roles
+
+adding more and more functionality to the playbooks will make it difficult to maintain in single file 
+
+	
+Default: it stores the data about 	role/application default variable eg- if u want to run to port 80 or 8080 then variable need to define in this path 
+
+file: it conatains files need to be transfered to the remote vm (static file)
+
+Handlers: they are triggers to task we can segragate all the handlers required in playbook.
+
+meta: this directory contains file that establish roles dependencies eg- author name , supported platform, dependencies if any. 
+
+Tasks: it conatains all the task that is normally in playbook eg- install packages and copy files etc
+ 
+
+
+
+
+ 
+
+
+
+
+
+

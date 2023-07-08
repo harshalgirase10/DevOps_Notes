@@ -1,0 +1,92 @@
+Comands only
+
+[]#service docker start
+[]#service docker status
+[]#dacker attach <conatainer name>
+[]#docker ps
+[]#docker images
+[]#docker ps -a
+[]#docker container rm <containername>
+[]#docker rename <oldname> <newname>
+[]#docker container rmi <containername>
+[]#docker diff <containername>
+
+
+
+
+[]#docker run -it ubuntu /bin/bash
+[]#docker run -it --name harshal ubuntu /bin/bash
+
+[]#vi Dockerfile
+FROM ubuntu
+COPY . /harshal
+
+[]#docker build -t myimage .
+[]#docker run -it --name mycontainer myimage /bin/bash
+
+Volumes
+[]#docker run -it --name conatiner3 -v /volume2 ubuntu /bin/bash
+(container to container volume share)
+[]#docker run -it --name container4 --privileged=true --volumes-from container3 ubuntu /bin/bash
+
+
+(Host to conatainer) 
+
+[]#docker run -it --name hostcont -v /home/ec2-user:rajput --privileged=true ubuntu /bin/bash
+
+
+
+
+Port mapping 
+
+[]#docker run -td --name techserver -p 80:80 ubuntu 
+
+[]#docker port techserver 
+
+[]#docker exec -it techserver /bin/bash
+
+in ubuntu----->
+
+[]#apt-get update
+
+[]#apt-get install apache2 -y
+
+[]#cd /var/www/html
+ echo "qweerty hi hello" > index.html
+
+[]#service apache2 restart
+
+
+now check ec2 public ip in chrome 
+
+
+[]#docker run -td --name myjenkins -p 8080:8080 jenkins 
+
+now check ec2ip:8080 in chrome 
+
+update ec2 security group inbound setting 
+
+
+Stop All running container 
+[]#docker stop $(docker ps -a -q)
+
+Delete All stopped container
+[]#docker rm $(docker ps -a -q)
+
+Delete All images
+[]#docker rmi -f $(docker image -q)
+
+
+
+if master node is reboot then docker gets stop
+to ensure that if master node restarts docker should start automatically on runtime....then command is 
+
+sudo systemctl enable docker
+
+
+
+
+
+ 
+
+

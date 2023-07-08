@@ -1,0 +1,344 @@
+Docker
+
+1.Docker is an open source centralised platform design to create, deploy and run application. 
+2. Docker uses container and host operating system to run application. It allows application to use same Linux kernel as system on host computer rather than creating a whole virtual operating system.
+3. We can install Docker on any operating system, but Docker engine runs natively on Linux distribution.
+4. Docker has written in "Go" language.
+5. Docker is a tool that performs OS level virtualization. Also known as containerization.
+6. Before Docker, many user faces the problem that particular code is running in the deployers system but not in user system.
+7. Docker was first released in March 2013. It is deployed by Solomon hikes and Sebastian Paul.
+8. Docker is set of platform as surveys that uses OS level virtualization whereas VMware uses hardware level virtualization.
+
+
+Advantages of Docker.
+1. No pre allocation of RAM.
+2. CI efficiency. Docker enables you to build container image and use that same image across every step of deployment process.
+3. Less cost.
+4. It is light in weight.
+5. It can run on physical hardware, virtual hardware Or on cloud.
+6. You can reuse the image.
+7. It took very less time to create container.
+
+Drawbacks of Docker.
+1. It is not a good solution for application which requires Rich GUI.
+2. Difficult to manage Large amount of containers.
+3. It does not provide cross platform compatibility Means if an application is designed to run in a Docker container on a window then it can't run on Linux or vice versa.
+4. Docker is suitable when deployment OS and testing OS are same. If the OS is different, we should use VMware.
+5. No solution for data recovery and backup.
+
+Docker Daemon.
+It run on host operating system.
+It is responsible for running containers to manage Docker services.
+Docker Daemon can communicate with other Daemon.
+
+
+Docker Client.
+Docker user can interact with Docker through client.
+Docker client uses commands and rest API to communicate with the Docker daemon.
+When client run any server command on Docker Client Terminal, the client terminal sends does Docker command to the Docker Daemon.
+It is possible for Docker client to communicate with more than one demon.
+
+
+Docker Host. 
+Docker host is used to provide an environment to execute and run application. It contains the Docker daemon, images, containers, network and storage.
+
+Docker Hub/Registry
+Docker hub, managed and store Docker images.
+There are 2 type of registries.
+1. Public registry. --> It is also known as Docker hub.
+2. Private. --> it use save image in enterprise level only.
+
+Docker Images.
+It is read only binary templates used to create Docker containers. 
+Single file with all dependencies and configuration required to run program.
+
+Ways to create images.
+1. take  image from Docker hub.
+2. Create image from Docker file.
+3. Create image from existing Docker container.
+
+Docker container.
+Container hold the entire packages that is needed to run the application.
+                        Or 
+In other words, we can say that the image is template and the container is copy of that template. 
+Container is like virtual machine. 
+Image becomes container when they run on Docker engine.
+
+
+====>Docker basic Commands<====
+To see all images present in local machine.
+[]#Docker images.
+To find out images in Docker hub.
+[]# Docker search "Jenkins"
+To download image from Docker hub to local machine.
+[]# docker pull "Jenkins"
+To give name to the container.
+[]# docker run -it --name  Harshal ubuntu /bin/bash
+To check service start or not.
+[]# service docker status
+To start container.
+[]#Docker start harshal
+To go inside container.
+[]#Docker attach harshal
+To see containers.
+[]#Docker ps -a
+To stop container.
+[]#Docker stop harshal
+To delete container.
+[]#Docker RM harshal
+
+
+now we have to create container from our own image.
+Therefore, create one container first.
+[]# Docker run -it --name harshalcontainer ubuntu /bin/bash
+
+
+Now create one file inside TMP directory.
+[]#Touch myfile.
+
+Now if you want to see difference between the base image and changes on it then.
+[]# docker diff harshal container
+
+Output
+C /root
+A /root/bash/history
+C /tmp
+A /tmp/myfile
+
+now create image of this container.
+[]#docker commit <containername> <imagename>
+
+[]# docker images
+
+now create container from this image.
+[]# docker run -it --name rajcontainer updateimage /bin/bash
+
+
+Dockerfile.
+Docker file is basically text file which contains some set of instructions. 
+Automation of Docker image creation.
+
+Docker Components.
+
+FROM:  For base image, this command must be on top of the Docker file.
+RUN:   to execute command. It will create layer in image.
+MAINTAINER: autor/owner/distributor
+COPY: Copy file from local system.(dockervm) We need to provide source, destination. (We can't Download file from Internet and any remote repository)
+ADD: Similar to copy but it provide feature to Download file from Internet. Also we extract file at Docker image site.
+EXPOSE: to expose ports such as port 8080 for Tomcat, Port 80 For NGINX. etc
+WORKDIR: To set working directory for container.
+CMD: Execute commands, but during container creation.
+ENTRYPOINT: Similar to CMD but higher priority over CMD. First command will be executed by ENTRYPOINT only.
+ENV: Environment variables. 
+
+
+
+Dockerfile.
+
+Create file named Dockerfile.
+Add instructions in file.
+Build Docker file to create image. 
+Run image to create container.
+
+vi Dockerfile
+FROM ubuntu
+RUN echo "TG thanks" >/tmp/testfile
+
+to create image out of Docker file.
+[]#docker build -t myimage .
+[]#docke rps -a 
+[]#docker images
+
+now create container from above image.
+[]#docker run -it --name mycontainer myimage /bin/bash
+
+output 
+cat /tmp/testfile
+TG thanks
+
+
+vi Dockerfile
+FROM ubuntu
+WORKDIR /tmp
+RUN echo "TG thanks a lot" >/tmp/testfile2
+ENV myname HarshalVG
+COPY testfile1 /tmp
+ADD test.tar.gz
+
+
+Docker volume.
+volume is simply directory inside our container.
+Firstly, we have to declare this directory as a volume and then share volume. 
+Even if we stop container still we can access volume. 
+Volume will be created in one container. 
+You can declare directory as a volume only while creating container. 
+You cannot create volume from existing container. 
+You can share one volume across any number of containers. 
+Volume will not be included when you update an image. 
+You can map volume in 2 ways. 
+1.Container to container 
+2.host to container.
+
+
+Benefit of volume.
+
+Decoupling container from storage. 
+Share volume among different container. 
+Attach volume to container. 
+deleting container volume does not delete.
+
+Creating volume from Docker file.
+
+vi Dockerfile
+
+FROM ubuntu
+VOLUME ["/myvolume1"]
+
+then create image from this Docker file. 
+[]#docker build -t myimage .
+
+Now create container from this image and run. 
+[]#docker run -it --name conatiner1 myimage /bin/bash
+
+now do []#ls you can see my volume.
+
+Now share volume with other container. 
+Container to container.
+[]#docker run -it --name container2 --privileged=true --volumes-from container1 ubuntu /bin/bash
+
+Now after creating container2, my volume one is visible whatever you do in one volume. Can see from other volume.
+
+
+Now try to create volume by using command.
+
+[]#docker run -it --name conatainer3 -v /volume2 ubuntu /bin/bash
+[]#ls 
+output  ---> cd /myvolume
+
+Now create one file in volume2 & exit 
+ and now create one more container and share volume2
+
+[]#docker run -it --name conatiner4 --privileged=true --volumes-from container3 ubuntu /bin/bash
+
+now you can see container3 and container4 volumes are same 
+
+
+volumes
+(host to container)
+[]#docker run -it --name hostcont -v /home/ec2-user:rajput --privileged=true ubuntu /bin/bash
+
+now ec2 machine and rajput file is mapped. whatever we change change in rajput file can see in ec2 machin and vice versa
+
+
+Some other impportant commands
+[]#docker volume ls
+[]#docker volume create <volumename>
+[]#docker volume rm <volumename>
+[]#docker volume prune (it will remove all unused volume only)
+[]#docker volume inspect <volumename>
+[]#docker container inspect <containername>
+
+
+Docker Port Expose
+
+[]#docker run -td --name techserver -p 80:80 ubuntu 
+[]#docker ps
+
+[]#docker port techserver
+ output -===> 80/tcp  0.0.0.0/80
+
+[]#docker exec -it techserver /bin/bash
+[inside container]#apt-get update
+[inside container]#apt-get install apache2 -y
+
+cd /var/www/html
+echo "Thanks TG Thanks" > index.html
+
+service apache2 start
+docker run -td --name myjenkins -p
+
+8080:8080 jenkins
+
+difference between Docker attach and Docker exec.
+Docker Attach==> Docker exec creates a new process in containers environment, 
+while Docker attached just connect a standard input/output of the main process inside the container.
+to corresponding standard input/output error of current terminal.
+
+Docker exec ==>  is simply running new things in a already started container But it in a shell or some other process.
+
+PID --> process ID
+PPID -->parent process ID.
+
+Difference between X force and published a Docker
+Basically you have 3 options
+1. Neither specify expose nor -p
+2. Only specify expose. 
+3. specify expose and- P.
+
+
+If you specify neither expose nor -P, the service in the container will only be accessible from inside the container itself. 
+If you expose a port, the service in the container is not accessible from outside docker but from inside other Docker container. So this is good for inter Container communication.
+
+
+How to put Docker image in Docker hub.
+[]#docker run -it ubuntu /bin/bash
+Now create some files inside container.
+[]#touch filex filey filez
+Now create image of this container. 
+[]#docker commit conatainer1 image1
+
+
+now create account in a Docker hub. (Hub.docker.com)
+
+Now go to EC2 to instance. 
+[]#docker login
+Enter your username and password. 
+
+Now give tag to you your image. 
+[]#docker tag image1 dockerid/newimage
+[]#docker push dockerid/newimage
+
+Now you can see this image in Docker hub account 
+
+now Create one instance in Tokyo region and pull image from hub.
+
+[]#docker pull dockerid/newimage
+[]#docker run -it --name mycontainer dockerid/newimage /bin/bash
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+

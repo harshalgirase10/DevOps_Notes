@@ -512,6 +512,27 @@ All container in the pod are ready
 
 
 
+1 what is monolithic architecture in kubernets and how to shift from monolithic to microservices how can they club kubernetes
+
+2 explain kubernets architecture
+
+3 what is docker swarn
+
+4 kubertenes vs docker swarn which is better and why ?
+
+5 kubernetes services on which you have worked still now 
+
+6 what is namespace in k8s
+
+7 what is operator in kubernetes
+
+8 explain ingress controller
+
+9 what if pod is not getting scheduled. how to troubleshoot.
+
+10 how can we forward port 8080 in container to service to ingress to browser..everyone using 8080 as port but browser using 80..how to do it?
+
+
 
 
 

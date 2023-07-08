@@ -1,0 +1,518 @@
+***49
+Labes and Selectors
+
+* Labels are the mechanism you use to organize Kubernators objects
+* A label is a key value pair without any predefined meaning that can be attached to the objects
+*  labels are similar to tags in a aws are in a git You use a name to quick reference
+* So you are free to choose label as you need it to refer an environment which is used for developing or testing or production refer a product group like deployment A,deployment B
+
+* Now if you want to add an a label to an existing pod
+  kubectl label pods <podname> <key=value>
+  kubectl get pods --show-label
+ 
+* Unlike name/Uid's label do not provide uniqueness as in a general we can expect many objects to carry a same    label
+* Once labels are attached to an object we would need filters to narrow down and thus are called as a label    selectors
+* The API currently supports two type of selectors 
+  1 equality based
+  2 set based
+
+  1 equality based:-
+  (=,!=)
+ name: bhupinder
+ clas: nodes
+ projects: devlopment
+
+  2 set based
+(in, notin,exists)
+ env in (production,dev)
+ env notin (team1, team2)
+
+* A label selector can be made of multiple requirements which are comma(,) separated
+* Cubanet is also supports set based selectors i.e. match multiple vlues
+
+**Node Selector
+
+* One use case for selecting labels is to constrain the set of nodes onto which a pod can schedule i.e. you can tell pod to on be able to run on perticuler nodes
+
+* 
+
+
+
+****50
+
+deployment and rollback 
+Replication controller and replica set is not able to do update and rollback apps in the cluster
+A deployment object act as a supervisor for pods giving you fine grained control over how and when a new pod is rolled out,updated or rolled back to a previous state 
+When using deployment object we first defined the state of application then K8s cluster schedules mentioned app instance on a specific individual nodes
+K8s is then monitors if the node hosting on instance goes down or pod is deleted the deployment controller replaces it.
+this provides a self healing mechanism to address machine failure or maintenance.
+***the deployment provides declarative updates for parts and replicas***
+
+
+
+
+The followings are typically used cases of deployments
+
+1.Create a deployment to roll out a replica set -> The Replica set creates pods in the background check the status of the role out to see if it succeeded or not
+2.Declare the new state of pods by updating the pod template specification of the deployment a new replica set is created and the deployment manages moving the pods from the old replica set to the new one at a controlled rate each new replica set updates the revision of the deployment
+3.rollback to an earlier deployment revision -> If the current state of the deployment is not stable each rollback updates the revision of the deployment
+4. Scale up the deployment to facilitate more load
+5. Pause the deployment to apply multiple fixes to its pod template specification and then resume it to start a new rollout
+6. Clean up older replica set that you don't need anymore
+
+* If there are problems in a deployment kubernetes will automatically rollback to the previous version however you can also explicitly rollback to a specific version 
+* You can roll back to a specific version by specifying it with (--to-revision)
+* When you inspect the deployment in your cluster the following field are displays
+ -name
+ -ready
+ -up-to-date
+ -availability
+ -age
+
+
+
+#########################################################################################################################################################################
+**51
+
+Kebernetes Networking, Services, Nodeport and Voluems
+
+
+Kubernetes Networking Addreses 4 Concerns:-
+1. containers within a pod use networking to communicate via loopback
+2. Cluster networking provides communication between different pods
+3. the service resources lets you expose on application running pods to be reachable from outside your cluster
+4. you can also use services to publish services only for sonsumption inside your cluster
+
+Container to container communication on same pod happens through localhost within the container
+
+
+ Now try to established communication between two different pods within same machine.
+1. pod to pod communication on same worker node happens through pod ip
+2. by default pod's ip will not be accessible outside the node
+
+
+
+*****************SERVICES*******************************
+
+
+each pod get its own IP address, however in a deployment, the set of pods running in one moment in time could be different from the set of pods running that application a moment later
+
+this leads to a problem: if some set of pods (call them backends) provide functionality to other pods(call them frontend) inside your cluster, how do the front end find out and keep track of which IP address to connect to,so that the frontend can use the backend part of the workload.
+
+* Add using RC, pods are terminated and created during scaling or replication operations.
+* when using deployments,while updating the image version the pods are terminated and new pods takes the place of other pods.
+* pods are very dynamic, i.e. they came and go on the K8s cluster and on any of the available node and it would be difficult to access the pods as the pods ip changes once its recreated.
+* service object is logical bridge beween pod and end users, which provides virtual IP.
+* service allows clients to reliably connect to the containers running in the pod using the vertual ip.
+* Virtual IP is not an actual IP connected to a network interface but its purpose is purely to forward traffic to one or more pods
+* kubeproxy is the one, which keeps the mapping between the virtual ip and the pods up-to-date, which queries the API server to learn about new services in the cluster.
+
+* Although pod has a unique Ip address those IP are not exposed outside the cluster.
+* Services helps to expose the virtual IP mapped to the pods and allows application to receive traffic.
+* labels Are used to select which are the pods to be put under for service.
+* Creating a service will create an end point to access the pods/apllication in it.
+* Services can be exposed in a different way by specifying a type in the service specification.
+
+1.cluster ip
+2.Nodeport
+3.Load balancer:- Created by cloud provider that will route external traffic to every node on the nodeport. (e.g. ELB on AWS)
+4.Headless:- Creates several end points that are used to produce DNS records each DNS record is bound to pod
+
+* by By default service can run only between ports 30,000 to 32767
+* the set of pods targeted by a service is usually determined by a selector.
+
+
+
+Cluster ip:-
+1. Exposes VIP only reachable from within the cluster.
+2. mainly used to communicate between component of microservices
+
+
+***************NODEPORT**********************************************
+
+
+Nodeport:-
+Make a service accessible from outside the cluster.
+Excoses the service on the same port of each selected node in the cluster using NAT
+
+
+#########################################################################################################################################################################
+**52
+Persistent Voluems And Liveness probe
+
+*Persistent Voluem:-
+
+In a typical IT environment storage is managed by storage/system Administrator  the end user will just get instruction to use the storage but does not have to worry about the underlying storage management.
+
+in the containerized world we would like to follow similar rules, but it becomes challenging, given the many volume types we have seen earlier K8s resolved this problem with persistent volume systems.
+
+Persistent volume is a cluster wide resource that you can use to store data in a way that is persist beyond the lifetime of a pod
+
+The PV is not backed by locally attached storage on a worknode but by network storage system such as EBS,NFS or distributed filesystem like ceph
+
+kubernetes provide API for users and administrators to manage and consume storage. to manage the volumes it uses the persistent volume API resource type and to consume it, uses the  persistent volumes claims API Resource type.
+
+
+Persistent Voluem Claim:-
+
+In order to use PV you need to claim it first using a persistent volume claim(PVC)
+
+The PVC request a PV with your desired specification (size access modes speed etc) from Kubernetes and once a suitable PV  is found it is bound to a persistent volume claim.
+
+After a successful bound to pod you can mount it as a volume.
+
+once a user finishes its work, the attached PV  can be released. the underlying PV  can there be reclaimed and recycled for future uses
+
+AWS EBS:-
+
+AWS EBS Volume mounts on AWS EBS volume into your pod unlike emptydir which is erased when a pod is removed, the content of an EBS volume are preserved and volume is merely unmounted.
+
+There are some restrictions:-
+1. the nodes on which pods are running must be aws ec2 instances.
+2. Those instances need to be  in the same region and availability zone as the EBS volume
+3. EBS only supports a single EC2 instance mounting on a volume
+
+
+===========================================================================================
+
+liveness Probe/Healthcheck
+
+A pod is considered ready when all of its containers are ready
+
+In order to verify if container in pod is healthy and ready to serve traffic, K8s  provide for range of healthy checking mechanism.
+
+Health checks or probes are carried out by kubelet to determine when to recreate the container(for liveness probe) and used bye services and deployments to determine if pod should recieve traffic.
+
+for  eg. -> liveness probe could catch deadlock, when an application is running but unable to make progress,  restarting a container in such state can help to make application more availabe despite bugs.
+
+one use of readyness probe is, to control which pods are used as a backends for services, when pod is not ready it is removed from service load balancers.
+
+For running healthchecks we would use command specific to the application
+
+if the commands succeeds, it returns 0, and the kubelet considers the container to be alive and healthy, if the command returns a non zero value the kubelet kills the pod and recreate it.
+
+#########################################################################################################################################################################
+**53
+Configmap And Secret
+
+*ConfigMap==>
+
+while performing application deployment on Kubernetes cluster sometimes we need to change the application configuration file depending on environments like dev, QA storage or project.
+
+Changing this application configuration file means we need to change source code, commit the change, creating a new image and then go through the complete deployment process.
+
+Hence these configuration should be decoupled from image content in order to keep containerized application portable.
+
+this is where Kubernetes configmap comes handy. It allowed us to handle configuration files much more efficiently.
+
+Configure map are useful for storing and sharing non sensitive, unencrypted configuration information, use secret otherwise.
+
+Configmap can be used to store fine grain information like, individual properties or entire config file.
+ 
+Configmap are not intended to act as a replacement for a properties file.
+
+* Configmap can be accesed using two types:-
+
+1. As Environment Variable
+2. As Volumes in pod
+
+kubectl create configmap <mapname> --from-file=<file-to-read>
+
+====================================================================================
+*Secret==>
+
+You dont want sensitive information such as database password or an API key kept around in clear text.
+
+Secret provides you with mechnism to use such information in safe and reliable way this following properties:-
+
+secrets are namespace objects that is exists in the context of the namespace.
+
+You can access them  via a volume or an environment variable from a container running to a pod.
+
+The secret data on node is stored in tmpfs volumes (tmpfs is a file system which keeps all files in virtual memory everything in tmpfs temporary in the sense that no file will be created on your hard drive. 
+
+A per secret size limit of 1MB exist
+the API Stores secret as plaintext in etcd
+
+Secret can be created
+1.From a  textfile
+2. from a yaml file
+
+
+
+#########################################################################################################################################################################
+***54
+NameSpace Resource Qouta
+
+NameSpaces:-
+You can name your object but if many are using the cluster then it would be difficult for managing.
+
+A namespace is a group of related elements that each have a unique name.
+namespace is used to uniquely identify one or more names from other similar names of different objects.
+
+Kubernetes namespaces help different projects teams or customers to share a Kubernetes clusters and provides:-
+A scope of every names.
+A mechanism to attach authorization and policy To a subsection of a cluster.
+
+By default a kubernetes is cluster will instantiate a default namespace when provisioning the cluster to hold the default set of pods services and deployments used by the cluster.
+
+We can use resource quota on specifying how many resources each namespace can use.
+
+Most Kubernetes Resources (i.e. pods services replication controller and others) are in same namespaces and low level resources such as nodes and persistent volumes are not in any namespaces.
+
+Namespaces are intended for use in environments with many users spreads across multiple teams.
+
+Let us assume we have shared Kubernetes cluster for Dave and production use cases.
+
+The dev team would like to maintain a space in the cluster where they can get a view on the list of ports services and deployments they used to build and run their application in this no restrictions are put on who can or cannot modify resources to enable agile development.
+
+For production team we can enforce strict procedure on who can or cannot manipulate the set of parts services and deployments.
+
+
+
+
+
+** Managing computer resources for containers:-
+A pod in Kubernetes will run with no limits on cpu and memory.
+
+You can optionally specify how much cpu and memory(RAM) each container needs.
+
+Scheduler decides about which nodes to place pods, only if the node has enough cpu resources available to satisfy the pods cpu request.
+
+CPU is specified in units of cores and Memory is specified in units of bytes.
+
+Two type of constraints can be set for each resource type request and limits:-
+
+A request is a amount of that resources that the system will guarantee for the container and Kubernetes will use this value to decide on which node to place the pod
+
+A limit is the max amount of resources that Kubernetes will allow the container to use. in case the request is not set for a container it default to limits if limit is not set then if default to 0.
+
+Cpu values are specified in Melicpu and memory in MB
+
+
+some scenarios
+
+****1st scenario
+cluster=200m
+request= 100
+limit= 150
+
+it works fine
+
+
+***2nd scenario
+
+cluster=200
+request=none
+limit=150 
+
+request=limit
+it will allow 150 as limit
+
+****3rd scenario
+
+cluster=200
+request=50
+limit=none
+
+request=clusterlimit
+
+it assigne cluster limit..which will be 200
+
+***4th scenario
+
+cluster=200
+request=250
+limit=150
+
+will generate error
+
+
+Resource Qouta
+
+K8s cluster can be divided into namespaces.
+if a container is created in a namespace that has a default cpu limit and the container does not specify its own cpu limit then the container is assigned the default cpu limit.
+
+Namespaces can be assigned resource quota objects this will limit the amount of usage allowed to the objects in the name spaces
+
+You can limit:-
+1.Compute
+2.Memory
+3.Storage
+
+two restrictions that resource quota imposes on a namespaces:
+
+1.Every container that runs in a namespace must have its own cpu limit
+2.The total amount of CPU used by all container in the namespace must not exceed a specified limit.
+
+
+
+
+#########################################################################################################################################################################
+***55
+Resource Quota and horizantal scalling 
+
+
+
+Default Range 
+CPU:
+request- 0.5
+limit- 1
+Memory:
+request- 0.5
+limit-1
+
+
+Horizontal Pod Autoscaler.
+
+Kubernetes has the possibility to automatically scale pods based on observed CPU utilization which is horizontal pod autoscaling.
+
+Scaling can be done only for scalable objects like controller, deployment or replica set.
+
+HPA is implemented as a kubernetes API resources and a controller.
+
+The controller Periodically Adjust the number of replicas in a replication controller or deployment to match the observed average CPU utilization to the target specified by user.
+
+The HPA is implemented as a controlled loop with a period controlled by the controller manager horizontal pod auto scalar sync period. flag (default value of 30 sec)
+
+During each. Controller manager queries the resources utilization against the metric specified in each horizontal pod auto scalar definition.
+
+
+For per pod resource metrics (like, CPU) the controller fetches the metrics from the resource metrics API for each pod targeted by the HPA.
+
+Then if a target utilization value is set, the controller calculates the utilization value as a percentage of the equivalent resource request on the container in each pod.
+
+If a target raw value is set, the raw metric value are used directly. the controller then takes the mean of the utilization. 
+
+Cool down period to Wait before another downscale operation can be performed is controlled by HPA downtime stabilization.             flag (default value of 5 min)
+
+Metric server needs to be deployed in the cluster to provide metric via the resource metrics API.
+
+
+#kubectl autoscale deployment mydeploy --cpu-percent=20 --min=1 --max=10
+
+
+
+#good shayariiiiii
+
+ban jaye agar baat , to kehte sab kya kya 
+aur baat bigad jate , to kya kya nahi kehte 
+
+
+
+#########################################################################################################################################################################
+***56 
+Jobs,Init,Container, Pod life-cycle
+
+*jobs(object)
+
+
+
+We have replica sets daemonsets,statefullset and deployments they all share one common property. they ensure that their pods are always running if a pod fails the controller recreate it or reschedules it to another node to make sure the application the pod is hosting keeps running.
+
+use cases:
+1. take backup of a Database
+2. helm charts uses jobs.
+3. Running batch processes.
+4. Run a task at a scheduled interval.
+5. Log rotation.
+
+
+*Job does not get deleted by itself we have to delete it
+
+
+
+If we have multiple nodes hosting the application for high availability which nodes handles cron?
+
+What happens if multiple identical cron job runs simultaneously?
+
+
+init container:
+
+Init container are specialised containers that run before app container in a pod.
+
+init container always run to completion
+
+If a pods init container fails, kubernetes repeatedly restarts the pods until the init container succeeds.
+
+Init containers do not supports readiness probe
+
+
+use cases:
+Seeding a database
+
+Delaying the application launch until the dependencies are ready
+
+Clone a git repository into a volume
+
+Generate a configuration file dynamically
+
+=================================================================================================
+
+
+**POD lifecycle:-
+
+
+pending--> Running--> Succeded--> Failed--> Completed--> Unkwon
+
+The phase of a pod is a simple high level summary of where the pod is in its life cycle
+
+Pending:-
+the pod has been accepted by the Kubernetes system but its not running
+
+One or more of the container images is still downloading
+
+If the pod cannot be scheduled because of resource constraints
+
+*Running:-
+The pod has been bound to a node 
+all of the containers have been created 
+atleast one container is still running or is in the process of starting or restarting.
+
+Succeded:-
+All containers in the pod have terminated in success and will not be restarted
+
+Failed:-
+All containers in the pod have terminated and atleast one container has terminated in failures. 
+the container's either excited which non zero status or what terminated by the system
+
+Unkwon:- 
+the state of the pod could not be obtained
+Typically due to an error in network or communicating with the host of the pod
+
+Completed:-
+The pod had grown to completion as theirs nothing to see is running
+
+=================================================================================================
+Pod Conditions:-
+The pod has pod status which has an array of pod conditions through which the quad head has not paused
+
+Using kubectl describe pod podname you can get condition of a pod
+
+these are possible types
+
+Podscheduled:-
+The pod has been scheduled to a node 
+
+Ready:- 
+the pod is able to serve request and will be added to the load balancing pool of all matching services
+
+initialized:-
+all init container have started successfully
+
+uncheduled:-
+the scheduler cannot schedule the pod right now, for eg. due to lacking of resources or other constraints
+
+ContainerReady:-
+All container in the pod are ready
+
+
+
+#########################################################################################################################################################################
+
+
+
+
+
+
+
